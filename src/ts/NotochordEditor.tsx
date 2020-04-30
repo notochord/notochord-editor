@@ -1,10 +1,13 @@
 import React from 'https://dev.jspm.io/react@16.9';
 import Song from 'notochord-song/types/notochord-song';
 
+import { slabo27pxHHeightRatio, slabo27pxHWidthRatio } from './svgConstants';
+import { MeasuresRow } from './MeasuresRow';
+import { MeasureView } from './MeasureView';
+
 interface NotochordEditorProps {
   song: Song;
-  showTitle: boolean;
-  shouldResize: boolean;
+  cols: number;
   width: number;
   height: number;
   editable: boolean;
@@ -12,74 +15,68 @@ interface NotochordEditorProps {
   scaleDegrees: boolean;
 }
 interface NotochordEditorState { /* eslint-disable-line */
+  charData: CharData;
 }
 
 export class NotochordEditor extends React.Component<NotochordEditorProps, NotochordEditorState> {
   public static defaultProps = {
-    showTitle: true,
-    shouldResize: false,
-    width: 1400,
+    cols: 4,
+    width: 950,
     height: 600,
     editable: false,
     fontSize: 50,
     scaleDegrees: false,
   }
-
-  /* constants for layout and stuff */
-  private cols = 4;
-  private measureWidth = 237;
-  private rowHeight = 60;
-  private measureXPadding = 18.96;
-  private beatWidth = 54.51;
-  private H_HEIGHT = 33.33;
-  private topPadding = 13.335;
   
   public render(): JSX.Element {
+    const charData: CharData = {
+      HWidth: this.props.fontSize * slabo27pxHWidthRatio,
+      HHeight: this.props.fontSize * slabo27pxHHeightRatio,
+    }
+
+    const rowHeight = this.props.fontSize * 1.2;
     // Vertical space between rows.
-    const rowYMargin = 0.3 * this.rowHeight;
-
+    const rowYMargin = 0.3 * rowHeight;
     const innerWidth = this.props.width - 2;
-
-    // SVG width for each measure.
-    // @todo: shorten to 2 if the width/fontsize ratio is ridiculous?
-    this.measureWidth = innerWidth / this.cols;
-    this.measureXPadding = this.measureWidth * .08;
-    const measureInnerWidth = this.measureWidth - this.measureXPadding;
-    // SVG distance between beats in a measure.
-    this.beatWidth = measureInnerWidth / this.cols;
-    
-    // this.H_HEIGHT = this.props.fontSize * viewer.PATHS.slabo27px_H_height_ratio;
-    this.topPadding = 0.5
-      * (this.rowHeight - this.H_HEIGHT);
+    const measureWidth = innerWidth / this.props.cols;
+    const topPadding = 0.5 * (rowHeight - charData.HHeight);
 
     const rows: JSX.Element[] = [];
     let freeMeasures: JSX.Element[] = [];
+    const calcY = (): number => topPadding + ((rowHeight + rowYMargin) * rows.length);
     for(const measure of this.props.song.measures) {
-      const key = `row${rows.length} col${freeMeasures.length}`;
-      const x = this.measureWidth * freeMeasures.length;
       const measureView = (
-        <text x={x} key={key}>{measure.beats[0].chord}</text>
+        <MeasureView
+          key={freeMeasures.length}
+          x={measureWidth * freeMeasures.length}
+          width={measureWidth}
+          height={rowHeight}
+          measure={measure}
+          isLastInRow={freeMeasures.length === this.props.cols - 1}
+          charData={charData}
+          scaleDegrees={this.props.scaleDegrees}
+        />
       );
       freeMeasures.push(measureView);
-      if (freeMeasures.length === this.cols) {
+      if (freeMeasures.length === this.props.cols) {
         rows.push(
-          <g key={`row${rows.length}`} transform={`translate(0 ${this.rowHeight * rows.length})`}>
+          <MeasuresRow key={rows.length} y={calcY()}>
             {freeMeasures}
-          </g>
+          </MeasuresRow>
         );
         freeMeasures = [];
       }
     }
     if (freeMeasures.length) {
       rows.push(
-        <g key={`row${rows.length}`} transform={`translate(0 ${this.rowHeight * rows.length})`}>
+        <MeasuresRow key={rows.length} y={calcY()}>
           {freeMeasures}
-        </g>
+        </MeasuresRow>
       );
     }
     return (
       <svg
-        className="NotochordSVGElement"
+        className="NotochordSVGElement NotochordEditable"
         viewBox={`0 0 ${this.props.width} ${this.props.height}`}
         style={{ fontSize: this.props.fontSize }}
         width={this.props.width}
@@ -87,5 +84,10 @@ export class NotochordEditor extends React.Component<NotochordEditorProps, Notoc
         {rows}
       </svg>
     );
+  }
+  public componentDidMount(): void {
+    // this.props.song.onChange(() => {
+    //   this.setState({});
+    // });
   }
 }

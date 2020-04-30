@@ -12,6 +12,7 @@
       import serializedSong from './node_modules/notochord-song/blueSkies.mjs';
       import { NotochordEditor } from './dist/NotochordEditor.mjs';
 
+      serializedSong.measureContainer.measures[0] = ['Ab-', 'Eb+', 'A#dim', 'E#M'];
       const song = new Song(serializedSong);
       const element = React.createElement(NotochordEditor, { song }, null);
       ReactDOM.render(element, document.querySelector('#root'));

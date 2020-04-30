@@ -17,12 +17,14 @@
     "sourceType": "module"
   },
   "plugins": [
+    "eslint-plugin-react",
     "@typescript-eslint/eslint-plugin"
   ],
   "rules": {
     "eqeqeq": "error",
     "no-cond-assign": "off",
     "no-empty": ["error", { "allowEmptyCatch": true }],
+    "react/jsx-uses-vars": 1,
     "@typescript-eslint/ban-ts-ignore": "off",
     "@typescript-eslint/explicit-member-accessibility": "error",
     "@typescript-eslint/no-explicit-any": "off",

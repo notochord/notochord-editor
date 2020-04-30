@@ -12,7 +12,7 @@
 .NotochordPlayedBeat text {
   fill: lightblue;
 }
-.NotochordEditable g.NotochordBeatView .NotochordBeatViewBackground {
+.NotochordBeatViewBackground {
   fill: transparent;
 }
 .NotochordEditable g.NotochordBeatView:hover .NotochordBeatViewBackground {

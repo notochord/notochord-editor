@@ -4,12 +4,12 @@
     "module": "es6",
     "jsx": "react",
     "moduleResolution": "node",
+    "experimentalDecorators": true,
     "removeComments": false,
     "noImplicitAny": true,
     "strictNullChecks": true
   },
-  "files": [
-    "src/ts/NotochordEditor.tsx",
-    "src/ts/interfaces.d.ts"
+  "include": [
+    "src/ts/"
   ],
 }
