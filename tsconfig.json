@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "es6",
+    "jsx": "react",
+    "removeComments": false,
+    "noImplicitAny": true,
+    "strictNullChecks": true
+  },
+  "files": [
+    "src/NotochordEditor.tsx"
+  ],
+}

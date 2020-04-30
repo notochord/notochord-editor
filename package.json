@@ -1,0 +1,40 @@
+{
+  "name": "notochord-editor",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/NotochordEditor.mjs",
+  "types": "types/NotochordEditor.d.ts",
+  "scripts": {
+    "playground": "npx http-server -o playground.html",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npx rollup -c",
+    "build-declarations": "npx tsc -d --emitDeclarationOnly --declarationDir types/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/notochord/notochord-editor.git"
+  },
+  "author": "Jacob Bloom",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/notochord/notochord-editor/issues"
+  },
+  "homepage": "https://github.com/notochord/notochord-editor#readme",
+  "devDependencies": {
+    "@types/react": "^16.9.34",
+    "@typescript-eslint/eslint-plugin": "^2.21.0",
+    "@typescript-eslint/parser": "^2.21.0",
+    "eslint": "^6.8.0",
+    "http-server": "^0.12.1",
+    "rollup": "^1.17.0",
+    "rollup-plugin-alias": "^1.5.2",
+    "rollup-plugin-banner": "^0.2.0",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-typescript": "^1.0.1",
+    "tslib": "^1.10.0",
+    "typescript": "^3.5.3"
+  },
+  "peerDependencies": {
+    "notochord-song": "git+https://github.com/notochord/notochord-song.git#2.0.0"
+  }
+}
