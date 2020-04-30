@@ -3,11 +3,13 @@
     "target": "es6",
     "module": "es6",
     "jsx": "react",
+    "moduleResolution": "node",
     "removeComments": false,
     "noImplicitAny": true,
     "strictNullChecks": true
   },
   "files": [
-    "src/NotochordEditor.tsx"
+    "src/ts/NotochordEditor.tsx",
+    "src/ts/interfaces.d.ts"
   ],
 }

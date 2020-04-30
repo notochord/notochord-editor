@@ -6,7 +6,7 @@ const preamble = 'notochord-editor by Jacob Bloom\nThis software is provided as-
 
 export default [
   {
-    input: './src/NotochordEditor.tsx',
+    input: './src/ts/NotochordEditor.tsx',
     output: {
       file: './dist/NotochordEditor.mjs',
       format: 'esm'

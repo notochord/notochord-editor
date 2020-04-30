@@ -7,7 +7,9 @@
   "scripts": {
     "playground": "npx http-server -o playground.html",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npx rollup -c",
+    "build": "npm run build-less; npm run build-ts; # npm run build-declarations",
+    "build-less": "npx lessc src/less/NotochordEditor.less dist/NotochordEditor.css",
+    "build-ts": "npx rollup -c",
     "build-declarations": "npx tsc -d --emitDeclarationOnly --declarationDir types/"
   },
   "repository": {
@@ -26,6 +28,7 @@
     "@typescript-eslint/parser": "^2.21.0",
     "eslint": "^6.8.0",
     "http-server": "^0.12.1",
+    "less": "^3.11.1",
     "rollup": "^1.17.0",
     "rollup-plugin-alias": "^1.5.2",
     "rollup-plugin-banner": "^0.2.0",

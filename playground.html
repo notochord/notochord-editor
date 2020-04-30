@@ -1,15 +1,19 @@
 <html>
   <head>
     <title>notochord-editor playground</title>
+    <link rel="stylesheet" href="./dist/NotochordEditor.css">
   </head>
   <body>
     <div id="root"></div>
     <script type="module">
-      import React from 'https://dev.jspm.io/react';
-      import ReactDOM from 'https://dev.jspm.io/react-dom';
+      import React from 'https://dev.jspm.io/react@16.9';
+      import ReactDOM from 'https://dev.jspm.io/react-dom@16.13';
+      import Song from './node_modules/notochord-song/dist/notochord-song.web.mjs';
+      import serializedSong from './node_modules/notochord-song/blueSkies.mjs';
       import { NotochordEditor } from './dist/NotochordEditor.mjs';
 
-      const element = React.createElement(NotochordEditor, {}, null);
+      const song = new Song(serializedSong);
+      const element = React.createElement(NotochordEditor, { song }, null);
       ReactDOM.render(element, document.querySelector('#root'));
     </script>
   </body>
