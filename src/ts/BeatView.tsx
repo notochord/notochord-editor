@@ -12,6 +12,7 @@ interface BeatViewProps {
   beat: Beat;
   charData: CharData;
   scaleDegrees: boolean;
+  editable: boolean;
 }
 interface BeatViewState {
   editorOpen: boolean;
@@ -113,7 +114,7 @@ export class BeatView extends React.Component<BeatViewProps, BeatViewState> {
   }
 
   private openEditor(): void {
-    this.setState({ editorOpen: true });
+    if (this.props.editable) this.setState({ editorOpen: true });
   }
 
   private closeEditor(): void {

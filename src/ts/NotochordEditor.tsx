@@ -60,6 +60,7 @@ export class NotochordEditor extends React.Component<NotochordEditorProps, Notoc
           isLastInRow={freeMeasures.length === this.props.cols - 1 || isLast}
           charData={charData}
           scaleDegrees={this.props.scaleDegrees}
+          editable={this.props.editable}
         />
       );
       freeMeasures.push(measureView);
@@ -81,7 +82,7 @@ export class NotochordEditor extends React.Component<NotochordEditorProps, Notoc
     }
     return (
       <svg
-        className="NotochordSVGElement NotochordEditable"
+        className={`NotochordSVGElement${this.props.editable ? ' NotochordEditable' : ''}`}
         viewBox={`0 0 ${this.props.width} ${this.props.height}`}
         style={{ fontSize: this.props.fontSize }}
         width={this.props.width}

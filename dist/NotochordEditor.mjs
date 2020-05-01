@@ -203,7 +203,8 @@ class BeatView extends React.Component {
         return bottomText;
     }
     openEditor() {
-        this.setState({ editorOpen: true });
+        if (this.props.editable)
+            this.setState({ editorOpen: true });
     }
     closeEditor() {
         this.setState({ editorOpen: false });
@@ -227,7 +228,7 @@ class MeasureView extends React.Component {
         const beatWidthAndMargin = (this.props.width - beatMargin) / this.props.measure.length;
         const beatWidth = beatWidthAndMargin - beatMargin;
         const beatViews = this.props.measure.beats.map((beat, index) => {
-            return (React.createElement(BeatView, { key: index, x: beatMargin + (index * beatWidthAndMargin), width: beatWidth, height: this.props.height, beat: beat, charData: this.props.charData, scaleDegrees: this.props.scaleDegrees }));
+            return (React.createElement(BeatView, { key: index, x: beatMargin + (index * beatWidthAndMargin), width: beatWidth, height: this.props.height, beat: beat, charData: this.props.charData, scaleDegrees: this.props.scaleDegrees, editable: this.props.editable }));
         });
         return (React.createElement("g", { className: "NotochordMeasureView", transform: `translate(${this.props.x} 0)` },
             ending,
@@ -256,7 +257,7 @@ class NotochordEditor extends React.Component {
         let freeMeasures = [];
         const calcY = () => topPadding + ((rowHeight + rowYMargin) * rows.length);
         for (const { measure, ending, leftRepeat, rightRepeat, isLast } of this.getMeasuresAndRepeatInfo()) {
-            const measureView = (React.createElement(MeasureView, { key: freeMeasures.length, x: 1 + (measureWidth * freeMeasures.length), width: measureWidth, height: rowHeight, measure: measure, ending: ending, leftRepeat: leftRepeat, rightRepeat: rightRepeat, isLastInRow: freeMeasures.length === this.props.cols - 1 || isLast, charData: charData, scaleDegrees: this.props.scaleDegrees }));
+            const measureView = (React.createElement(MeasureView, { key: freeMeasures.length, x: 1 + (measureWidth * freeMeasures.length), width: measureWidth, height: rowHeight, measure: measure, ending: ending, leftRepeat: leftRepeat, rightRepeat: rightRepeat, isLastInRow: freeMeasures.length === this.props.cols - 1 || isLast, charData: charData, scaleDegrees: this.props.scaleDegrees, editable: this.props.editable }));
             freeMeasures.push(measureView);
             if (freeMeasures.length === this.props.cols) {
                 rows.push(React.createElement(MeasuresRow, { key: rows.length, y: calcY() }, freeMeasures));
@@ -266,7 +267,7 @@ class NotochordEditor extends React.Component {
         if (freeMeasures.length) {
             rows.push(React.createElement(MeasuresRow, { key: rows.length, y: calcY() }, freeMeasures));
         }
-        return (React.createElement("svg", { className: "NotochordSVGElement NotochordEditable", viewBox: `0 0 ${this.props.width} ${this.props.height}`, style: { fontSize: this.props.fontSize }, width: this.props.width }, rows));
+        return (React.createElement("svg", { className: `NotochordSVGElement${this.props.editable ? ' NotochordEditable' : ''}`, viewBox: `0 0 ${this.props.width} ${this.props.height}`, style: { fontSize: this.props.fontSize }, width: this.props.width }, rows));
     }
     componentDidMount() {
         this.props.song.onChange(() => {

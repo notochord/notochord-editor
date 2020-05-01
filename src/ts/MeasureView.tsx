@@ -14,6 +14,7 @@ interface MeasureViewProps {
   isLastInRow: boolean;
   charData: CharData;
   scaleDegrees: boolean;
+  editable: boolean;
 }
 
 export class MeasureView extends React.Component<MeasureViewProps> {
@@ -70,6 +71,7 @@ export class MeasureView extends React.Component<MeasureViewProps> {
           beat={beat}
           charData={this.props.charData}
           scaleDegrees={this.props.scaleDegrees}
+          editable={this.props.editable}
         />
       );
     });

@@ -12,10 +12,10 @@
   fill: transparent;
 }
 
-.NotochordBeatView:hover .NotochordBeatViewBackground {
+.NotochordEditable .NotochordBeatView:hover .NotochordBeatViewBackground {
   fill: #eef4f6;
 }
-.NotochordBeatView.NotochordBeatViewEditing .NotochordBeatViewBackground {
+.NotochordEditable .NotochordBeatView.NotochordBeatViewEditing .NotochordBeatViewBackground {
   fill: #d8ecf3;
 }
 
