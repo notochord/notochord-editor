@@ -1,26 +1,24 @@
-@font-face {
-  font-family: 'Slabo 27px';
-  font-style: normal;
-  font-weight: 400;
-  src: local('Slabo 27px'), local('Slabo27px-Regular'), url(https://fonts.gstatic.com/s/slabo27px/v6/mFT0WbgBwKPR_Z4hGN2qgxED0A.ttf) format('truetype');
-}
+@import url("https://fonts.googleapis.com/css?family=Slabo+27px&subset=latin-ext");
 .NotochordSVGElement {
-  font-family: 'Slabo 27px', serif;
+  font-family: "Slabo 27px", serif;
   dominant-baseline: hanging;
 }
-.NotochordPlayedBeat path,
-.NotochordPlayedBeat text {
+
+.NotochordPlayedBeat path, .NotochordPlayedBeat text {
   fill: lightblue;
 }
+
 .NotochordBeatViewBackground {
   fill: transparent;
 }
-.NotochordEditable g.NotochordBeatView:hover .NotochordBeatViewBackground {
+
+svg.NotochordEditable:hover .NotochordBeatViewBackground {
   fill: #eef4f6;
 }
-.NotochordEditable g.NotochordBeatView.NotochordBeatViewEditing .NotochordBeatViewBackground {
+svg.NotochordEditable.NotochordBeatViewEditing .NotochordBeatViewBackground {
   fill: #d8ecf3;
 }
+
 .NotochordChordEditor {
   position: absolute;
   visibility: hidden;
@@ -42,3 +40,5 @@
   transform: translateY(0);
   opacity: 1;
 }
+
+/*# sourceMappingURL=NotochordEditor.css.map */

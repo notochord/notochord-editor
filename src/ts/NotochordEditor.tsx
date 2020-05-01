@@ -86,8 +86,8 @@ export class NotochordEditor extends React.Component<NotochordEditorProps, Notoc
     );
   }
   public componentDidMount(): void {
-    // this.props.song.onChange(() => {
-    //   this.setState({});
-    // });
+    this.props.song.onChange(() => {
+      this.setState({});
+    });
   }
 }

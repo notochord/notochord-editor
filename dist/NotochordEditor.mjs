@@ -4,7 +4,6 @@
  */
 
 import React from 'https://dev.jspm.io/react@16.9';
-import { boundMethod } from 'autobind-decorator';
 import Tonal from 'https://dev.jspm.io/tonal@2.2';
 
 // https://commons.wikimedia.org/wiki/File:B%C3%A9mol.svg
@@ -25,28 +24,6 @@ class MeasuresRow extends React.Component {
     }
 }
 
-/*! *****************************************************************************
-Copyright (c) Microsoft Corporation. All rights reserved.
-Licensed under the Apache License, Version 2.0 (the "License"); you may not use
-this file except in compliance with the License. You may obtain a copy of the
-License at http://www.apache.org/licenses/LICENSE-2.0
-
-THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
-WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
-MERCHANTABLITY OR NON-INFRINGEMENT.
-
-See the Apache Version 2.0 License for specific language governing permissions
-and limitations under the License.
-***************************************************************************** */
-
-function __decorate(decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-}
-
 class BeatView extends React.Component {
     render() {
         const { rootText, accidentalText } = this.getRootText();
@@ -64,7 +41,7 @@ class BeatView extends React.Component {
         }
         const chordRootY = 0.3 * this.props.charData.HHeight;
         const bottom = (React.createElement("text", { transform: `translate(${this.props.charData.HWidth + 3} ${chordRootY + (0.5 * this.props.charData.HHeight)}) scale(0.5)` }, bottomText));
-        return (React.createElement("g", { className: "NotochordBeatView", transform: `translate(${this.props.x} 0)`, tabIndex: 0, onFocus: this.openEditor },
+        return (React.createElement("g", { className: "NotochordBeatView", transform: `translate(${this.props.x} 0)`, tabIndex: 0, onFocus: this.openEditor.bind(this) },
             React.createElement("rect", { className: "NotochordBeatViewBackground", width: this.props.width, height: this.props.height }),
             React.createElement("text", { transform: `translate(0 ${chordRootY})` }, rootText),
             accidental,
@@ -104,9 +81,6 @@ class BeatView extends React.Component {
         console.log('Opened editor');
     }
 }
-__decorate([
-    boundMethod
-], BeatView.prototype, "openEditor", null);
 
 class MeasureView extends React.Component {
     render() {
@@ -155,9 +129,9 @@ class NotochordEditor extends React.Component {
         return (React.createElement("svg", { className: "NotochordSVGElement NotochordEditable", viewBox: `0 0 ${this.props.width} ${this.props.height}`, style: { fontSize: this.props.fontSize }, width: this.props.width }, rows));
     }
     componentDidMount() {
-        // this.props.song.onChange(() => {
-        //   this.setState({});
-        // });
+        this.props.song.onChange(() => {
+            this.setState({});
+        });
     }
 }
 NotochordEditor.defaultProps = {

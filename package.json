@@ -7,8 +7,8 @@
   "scripts": {
     "playground": "npx http-server -o playground.html",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npm run build-less; npm run build-ts; # npm run build-declarations",
-    "build-less": "npx lessc src/less/NotochordEditor.less dist/NotochordEditor.css",
+    "build": "npm run build-scss; npm run build-ts; # npm run build-declarations",
+    "build-scss": "npx sass src/scss/NotochordEditor.scss dist/NotochordEditor.css",
     "build-ts": "npx rollup -c",
     "build-declarations": "npx tsc -d --emitDeclarationOnly --declarationDir types/"
   },
@@ -26,20 +26,19 @@
     "@types/react": "^16.9.34",
     "@typescript-eslint/eslint-plugin": "^2.21.0",
     "@typescript-eslint/parser": "^2.21.0",
-    "autobind-decorator": "^2.4.0",
     "eslint": "^6.8.0",
     "eslint-plugin-react": "^7.19.0",
     "http-server": "^0.12.1",
-    "less": "^3.11.1",
     "rollup": "^1.17.0",
     "rollup-plugin-alias": "^1.5.2",
     "rollup-plugin-banner": "^0.2.0",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-typescript": "^1.0.1",
+    "sass": "^1.26.5",
     "tslib": "^1.10.0",
     "typescript": "^3.5.3"
   },
   "peerDependencies": {
-    "notochord-song": "git+https://github.com/notochord/notochord-song.git#2.0.0"
+    "notochord-song": "git+https://github.com/notochord/notochord-song.git#2.1.0"
   }
 }

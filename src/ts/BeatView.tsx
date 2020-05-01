@@ -1,5 +1,4 @@
 import React from 'https://dev.jspm.io/react@16.9';
-import { boundMethod } from 'autobind-decorator';
 import Tonal from 'https://dev.jspm.io/tonal@2.2';
 import Beat from 'notochord-song/types/beat';
 
@@ -46,7 +45,7 @@ export class BeatView extends React.Component<BeatViewProps> {
         className="NotochordBeatView"
         transform={`translate(${this.props.x} 0)`}
         tabIndex={0}
-        onFocus={this.openEditor}
+        onFocus={this.openEditor.bind(this)}
       >
         <rect
           className="NotochordBeatViewBackground"
@@ -89,7 +88,6 @@ export class BeatView extends React.Component<BeatViewProps> {
     return bottomText;
   }
 
-  @boundMethod
   private openEditor(): void {
     console.log('Opened editor');
   }
