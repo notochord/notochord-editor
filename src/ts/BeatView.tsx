@@ -3,6 +3,7 @@ import Tonal from 'https://dev.jspm.io/tonal@2.2';
 import Beat from 'notochord-song/types/beat';
 
 import { deltaChar, sharp, sharpHeight, flat, flatHeight } from './svgConstants';
+import { BeatEditor } from './BeatEditor';
 
 interface BeatViewProps {
   x: number;
@@ -12,8 +13,14 @@ interface BeatViewProps {
   charData: CharData;
   scaleDegrees: boolean;
 }
+interface BeatViewState {
+  editorOpen: boolean;
+}
 
-export class BeatView extends React.Component<BeatViewProps> {
+export class BeatView extends React.Component<BeatViewProps, BeatViewState> {
+  public state = {
+    editorOpen: false,
+  }
   public render(): JSX.Element {
     const { rootText, accidentalText } = this.getRootText();
     const bottomText = this.getBottomText();
@@ -40,6 +47,12 @@ export class BeatView extends React.Component<BeatViewProps> {
         {bottomText}
       </text>
     );
+    const editor = (
+      <BeatEditor
+        open={this.state.editorOpen}
+        parentWidth={this.props.width}
+      />
+    );
     return (
       <g
         className="NotochordBeatView"
@@ -55,6 +68,7 @@ export class BeatView extends React.Component<BeatViewProps> {
         <text transform={`translate(0 ${chordRootY})`}>{rootText}</text>
         {accidental}
         {bottom}
+        {editor}
       </g>
     );
   }
@@ -89,6 +103,6 @@ export class BeatView extends React.Component<BeatViewProps> {
   }
 
   private openEditor(): void {
-    console.log('Opened editor');
+    this.setState({ editorOpen: true });
   }
 }

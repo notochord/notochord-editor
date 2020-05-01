@@ -22,7 +22,23 @@ class MeasuresRow extends React.Component {
     }
 }
 
+class BeatEditor extends React.Component {
+    render() {
+        return (React.createElement("foreignObject", { width: 66, height: 27, y: -25, x: (66 - this.props.parentWidth) / 2 * -1, className: `NotochordChordEditor${this.props.open ? ' show' : ''}` },
+            React.createElement("div", { 
+                // @ts-ignore
+                xmlns: "http://www.w3.org/1999/xhtml", className: "NotochordChordEditorContainer" },
+                React.createElement("input", null))));
+    }
+}
+
 class BeatView extends React.Component {
+    constructor() {
+        super(...arguments);
+        this.state = {
+            editorOpen: false,
+        };
+    }
     render() {
         const { rootText, accidentalText } = this.getRootText();
         const bottomText = this.getBottomText();
@@ -39,11 +55,13 @@ class BeatView extends React.Component {
         }
         const chordRootY = 0.3 * this.props.charData.HHeight;
         const bottom = (React.createElement("text", { transform: `translate(${this.props.charData.HWidth + 3} ${chordRootY + (0.5 * this.props.charData.HHeight)}) scale(0.5)` }, bottomText));
+        const editor = (React.createElement(BeatEditor, { open: this.state.editorOpen, parentWidth: this.props.width }));
         return (React.createElement("g", { className: "NotochordBeatView", transform: `translate(${this.props.x} 0)`, tabIndex: 0, onFocus: this.openEditor.bind(this) },
             React.createElement("rect", { className: "NotochordBeatViewBackground", width: this.props.width, height: this.props.height }),
             React.createElement("text", { transform: `translate(0 ${chordRootY})` }, rootText),
             accidental,
-            bottom));
+            bottom,
+            editor));
     }
     getRootText() {
         if (!this.props.beat.chord) {
@@ -76,7 +94,7 @@ class BeatView extends React.Component {
         return bottomText;
     }
     openEditor() {
-        console.log('Opened editor');
+        this.setState({ editorOpen: true });
     }
 }
 
