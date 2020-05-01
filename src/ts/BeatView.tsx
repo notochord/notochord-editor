@@ -21,6 +21,11 @@ export class BeatView extends React.Component<BeatViewProps, BeatViewState> {
   public state = {
     editorOpen: false,
   }
+  public constructor(props: BeatViewProps) {
+    super(props);
+    this.openEditor = this.openEditor.bind(this);
+    this.closeEditor = this.closeEditor.bind(this);
+  }
   public render(): JSX.Element {
     const { rootText, accidentalText } = this.getRootText();
     const bottomText = this.getBottomText();
@@ -49,8 +54,10 @@ export class BeatView extends React.Component<BeatViewProps, BeatViewState> {
     );
     const editor = (
       <BeatEditor
+        beat={this.props.beat}
         open={this.state.editorOpen}
         parentWidth={this.props.width}
+        closeEditor={this.closeEditor}
       />
     );
     return (
@@ -58,7 +65,7 @@ export class BeatView extends React.Component<BeatViewProps, BeatViewState> {
         className="NotochordBeatView"
         transform={`translate(${this.props.x} 0)`}
         tabIndex={0}
-        onFocus={this.openEditor.bind(this)}
+        onFocus={this.openEditor}
       >
         <rect
           className="NotochordBeatViewBackground"
@@ -86,10 +93,13 @@ export class BeatView extends React.Component<BeatViewProps, BeatViewState> {
         accidentalText: degree.flat ? 'b' : '',
       }
     } else {
-      const parsed: string[] = Tonal.Chord.tokenize(this.props.beat.chord);
+      const [rootPart] = Tonal.Chord.tokenize(this.props.beat.chord) as string[];
+      let accidentalText: 'b' | '#' | '' = '';
+      if (rootPart[1] === 'b') accidentalText = 'b';
+      if (rootPart[1] === '#') accidentalText = '#';
       return {
-        rootText: parsed[0].charAt(0),
-        accidentalText: parsed[0].charAt(1) as 'b' | '#' | '' ,
+        accidentalText,
+        rootText: rootPart[0],
       };
     }
   }
@@ -104,5 +114,9 @@ export class BeatView extends React.Component<BeatViewProps, BeatViewState> {
 
   private openEditor(): void {
     this.setState({ editorOpen: true });
+  }
+
+  private closeEditor(): void {
+    this.setState({ editorOpen: false });
   }
 }

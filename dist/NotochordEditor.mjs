@@ -23,21 +23,54 @@ class MeasuresRow extends React.Component {
 }
 
 class BeatEditor extends React.Component {
+    constructor(props) {
+        var _a, _b;
+        super(props);
+        this.inputRef = React.createRef();
+        this.state = {
+            inputValue: (_b = (_a = this.props.beat) === null || _a === void 0 ? void 0 : _a.chord) !== null && _b !== void 0 ? _b : '',
+        };
+        this.onChange = this.onChange.bind(this);
+    }
     render() {
         return (React.createElement("foreignObject", { width: 66, height: 27, y: -25, x: (66 - this.props.parentWidth) / 2 * -1, className: `NotochordChordEditor${this.props.open ? ' show' : ''}` },
             React.createElement("div", { 
                 // @ts-ignore
                 xmlns: "http://www.w3.org/1999/xhtml", className: "NotochordChordEditorContainer" },
-                React.createElement("input", null))));
+                React.createElement("input", { ref: this.inputRef, value: this.state.inputValue, onChange: this.onChange.bind(this), onBlur: this.props.closeEditor }))));
+    }
+    componentDidUpdate(prevProps) {
+        if (this.props.open && !prevProps.open) {
+            this.onOpen();
+        }
+    }
+    onOpen() {
+        var _a;
+        (_a = this.inputRef.current) === null || _a === void 0 ? void 0 : _a.focus();
+    }
+    onChange() {
+        var _a, _b;
+        const oldValue = this.props.beat.chord;
+        const inputValue = (_b = (_a = this.inputRef.current) === null || _a === void 0 ? void 0 : _a.value) !== null && _b !== void 0 ? _b : '';
+        this.props.beat.chord = inputValue || null;
+        const newValue = this.props.beat.chord;
+        if (newValue === oldValue) { // chord didn't change, the input is invalid
+            this.setState({ inputValue: inputValue });
+        }
+        else {
+            this.setState({ inputValue: newValue !== null && newValue !== void 0 ? newValue : '' });
+        }
     }
 }
 
 class BeatView extends React.Component {
-    constructor() {
-        super(...arguments);
+    constructor(props) {
+        super(props);
         this.state = {
             editorOpen: false,
         };
+        this.openEditor = this.openEditor.bind(this);
+        this.closeEditor = this.closeEditor.bind(this);
     }
     render() {
         const { rootText, accidentalText } = this.getRootText();
@@ -55,8 +88,8 @@ class BeatView extends React.Component {
         }
         const chordRootY = 0.3 * this.props.charData.HHeight;
         const bottom = (React.createElement("text", { transform: `translate(${this.props.charData.HWidth + 3} ${chordRootY + (0.5 * this.props.charData.HHeight)}) scale(0.5)` }, bottomText));
-        const editor = (React.createElement(BeatEditor, { open: this.state.editorOpen, parentWidth: this.props.width }));
-        return (React.createElement("g", { className: "NotochordBeatView", transform: `translate(${this.props.x} 0)`, tabIndex: 0, onFocus: this.openEditor.bind(this) },
+        const editor = (React.createElement(BeatEditor, { beat: this.props.beat, open: this.state.editorOpen, parentWidth: this.props.width, closeEditor: this.closeEditor }));
+        return (React.createElement("g", { className: "NotochordBeatView", transform: `translate(${this.props.x} 0)`, tabIndex: 0, onFocus: this.openEditor },
             React.createElement("rect", { className: "NotochordBeatViewBackground", width: this.props.width, height: this.props.height }),
             React.createElement("text", { transform: `translate(0 ${chordRootY})` }, rootText),
             accidental,
@@ -78,10 +111,15 @@ class BeatView extends React.Component {
             };
         }
         else {
-            const parsed = Tonal.Chord.tokenize(this.props.beat.chord);
+            const [rootPart] = Tonal.Chord.tokenize(this.props.beat.chord);
+            let accidentalText = '';
+            if (rootPart[1] === 'b')
+                accidentalText = 'b';
+            if (rootPart[1] === '#')
+                accidentalText = '#';
             return {
-                rootText: parsed[0].charAt(0),
-                accidentalText: parsed[0].charAt(1),
+                accidentalText,
+                rootText: rootPart[0],
             };
         }
     }
@@ -95,6 +133,9 @@ class BeatView extends React.Component {
     }
     openEditor() {
         this.setState({ editorOpen: true });
+    }
+    closeEditor() {
+        this.setState({ editorOpen: false });
     }
 }
 
