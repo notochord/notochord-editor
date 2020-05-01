@@ -12,10 +12,10 @@
   fill: transparent;
 }
 
-svg.NotochordEditable:hover .NotochordBeatViewBackground {
+.NotochordBeatView:hover .NotochordBeatViewBackground {
   fill: #eef4f6;
 }
-svg.NotochordEditable.NotochordBeatViewEditing .NotochordBeatViewBackground {
+.NotochordBeatView.NotochordBeatViewEditing .NotochordBeatViewBackground {
   fill: #d8ecf3;
 }
 

@@ -12,8 +12,6 @@ const flatHeight = 16.059999465942383;
 // https://commons.wikimedia.org/wiki/File:Di%C3%A8se.svg
 const sharp = 'm 4.6252809,-11.71096 c 0,-0.21414 -0.1713067,-0.40686 -0.38544,-0.40686 -0.2141334,0 -0.4068535,0.19272 -0.4068535,0.40686 l 0,3.1049303 -1.777307,-0.66381 0,-3.3833103 c 0,-0.21413 -0.19272,-0.40685 -0.4068534,-0.40685 -0.2141334,0 -0.3854401,0.19272 -0.3854401,0.40685 l 0,3.1049303 -0.68522678,-0.25696 c -0.0428267,-0.0214 -0.10706669,-0.0214 -0.14989337,-0.0214 C 0.19272004,-9.8265897 0,-9.6338697 0,-9.3983197 l 0,1.2847998 c 0,0.1713 0.10706669,0.34261 0.27837339,0.40685 l 0.98501351,0.34261 0,3.42614 -0.68522678,-0.23555 c -0.0428267,-0.0214 -0.10706669,-0.0214 -0.14989337,-0.0214 C 0.19272004,-4.1948799 0,-4.0021599 0,-3.7666099 l 0,1.2848 c 0,0.1713 0.10706669,0.3212 0.27837339,0.38544 l 0.98501351,0.36402 0,3.38331 c 0,0.21413 0.1713067,0.40685 0.3854401,0.40685 0.2141334,0 0.4068534,-0.19272 0.4068534,-0.40685 l 0,-3.10493 1.777307,0.66380998 0,3.38331002 c 0,0.21413 0.1927201,0.40685 0.4068535,0.40685 0.2141333,0 0.38544,-0.19272 0.38544,-0.40685 l 0,-3.10494002 0.6852268,0.25696 c 0.042827,0.0214 0.1070667,0.0214 0.1498934,0.0214 0.2355467,0 0.4282668,-0.19272 0.4282668,-0.42827 l 0,-1.28479998 c 0,-0.17131 -0.1070667,-0.34261 -0.2783734,-0.40685 l -0.9850136,-0.34262 0,-3.42613 0.6852268,0.23554 c 0.042827,0.0214 0.1070667,0.0214 0.1498934,0.0214 0.2355467,0 0.4282668,-0.19272 0.4282668,-0.42827 l 0,-1.2848 c 0,-0.17131 -0.1070667,-0.3212 -0.2783734,-0.38544 l -0.9850136,-0.36403 0,-3.3833001 z m -2.5696005,8.0728301 0,-3.42614 1.777307,0.6424 0,3.42614 z';
 const sharpHeight = 16.059999465942383;
-const bar = 'M 0,0 0,100';
-const barHeight = 100;
 const deltaChar = '\u0394';
 const slabo27pxHWidthRatio = 30 / 50;
 const slabo27pxHHeightRatio = 33.33 / 50;
@@ -84,9 +82,17 @@ class BeatView extends React.Component {
 
 class MeasureView extends React.Component {
     render() {
-        const barScale = this.props.height / barHeight;
-        const leftBar = (React.createElement("path", { d: bar, transform: `scale(${barScale})`, style: { strokeWidth: 1, stroke: 'black' } }));
-        const rightBar = this.props.isLastInRow ? (React.createElement("path", { d: bar, transform: `translate(${this.props.width} 0) scale(${barScale})`, style: { strokeWidth: 1, stroke: 'black' } })) : null;
+        const leftBar = (React.createElement("path", { d: `M 0,0 0,${this.props.height}`, style: { strokeWidth: 1, stroke: 'black' } }));
+        const rightBar = this.props.isLastInRow ? (React.createElement("path", { d: `M ${this.props.width},0 ${this.props.width},${this.props.height}`, style: { strokeWidth: 1, stroke: 'black' } })) : null;
+        const ending = this.props.ending && (React.createElement(React.Fragment, null,
+            React.createElement("text", { x: this.props.width * 0.02, y: this.props.height * -.17, fontSize: this.props.charData.fontSize * 0.25 }, this.props.ending),
+            React.createElement("path", { d: `M 0,${this.props.height * -.05} 0,${this.props.height * -.2} ${this.props.width},${this.props.height * -.2}`, style: { strokeWidth: 1, stroke: 'black', fill: 'none' } })));
+        const leftRepeat = this.props.leftRepeat ? (React.createElement(React.Fragment, null,
+            React.createElement("circle", { cx: this.props.width * 0.03, cy: this.props.height * 0.4, r: this.props.height * 0.03 }),
+            React.createElement("circle", { cx: this.props.width * 0.03, cy: this.props.height * 0.6, r: this.props.height * 0.03 }))) : null;
+        const rightRepeat = this.props.rightRepeat ? (React.createElement(React.Fragment, null,
+            React.createElement("circle", { cx: this.props.width * 0.97, cy: this.props.height * 0.4, r: this.props.height * 0.03 }),
+            React.createElement("circle", { cx: this.props.width * 0.97, cy: this.props.height * 0.6, r: this.props.height * 0.03 }))) : null;
         const beatMargin = this.props.width * 0.06;
         const beatWidthAndMargin = (this.props.width - beatMargin) / this.props.measure.length;
         const beatWidth = beatWidthAndMargin - beatMargin;
@@ -94,8 +100,11 @@ class MeasureView extends React.Component {
             return (React.createElement(BeatView, { key: index, x: beatMargin + (index * beatWidthAndMargin), width: beatWidth, height: this.props.height, beat: beat, charData: this.props.charData, scaleDegrees: this.props.scaleDegrees }));
         });
         return (React.createElement("g", { className: "NotochordMeasureView", transform: `translate(${this.props.x} 0)` },
+            ending,
             leftBar,
+            leftRepeat,
             beatViews,
+            rightRepeat,
             rightBar));
     }
 }
@@ -105,6 +114,7 @@ class NotochordEditor extends React.Component {
         const charData = {
             HWidth: this.props.fontSize * slabo27pxHWidthRatio,
             HHeight: this.props.fontSize * slabo27pxHHeightRatio,
+            fontSize: this.props.fontSize,
         };
         const rowHeight = this.props.fontSize * 1.2;
         // Vertical space between rows.
@@ -115,8 +125,8 @@ class NotochordEditor extends React.Component {
         const rows = [];
         let freeMeasures = [];
         const calcY = () => topPadding + ((rowHeight + rowYMargin) * rows.length);
-        for (const measure of this.props.song.measures) {
-            const measureView = (React.createElement(MeasureView, { key: freeMeasures.length, x: measureWidth * freeMeasures.length, width: measureWidth, height: rowHeight, measure: measure, isLastInRow: freeMeasures.length === this.props.cols - 1, charData: charData, scaleDegrees: this.props.scaleDegrees }));
+        for (const { measure, ending, leftRepeat, rightRepeat, isLast } of this.getMeasuresAndRepeatInfo()) {
+            const measureView = (React.createElement(MeasureView, { key: freeMeasures.length, x: 1 + (measureWidth * freeMeasures.length), width: measureWidth, height: rowHeight, measure: measure, ending: ending, leftRepeat: leftRepeat, rightRepeat: rightRepeat, isLastInRow: freeMeasures.length === this.props.cols - 1 || isLast, charData: charData, scaleDegrees: this.props.scaleDegrees }));
             freeMeasures.push(measureView);
             if (freeMeasures.length === this.props.cols) {
                 rows.push(React.createElement(MeasuresRow, { key: rows.length, y: calcY() }, freeMeasures));
@@ -132,6 +142,33 @@ class NotochordEditor extends React.Component {
         this.props.song.onChange(() => {
             this.setState({});
         });
+    }
+    *getMeasuresAndRepeatInfo(container = this.props.song.measureContainer) {
+        for (let i = 0; i < container.measures.length; i++) {
+            const measure = container.measures[i];
+            if ('type' in measure) {
+                yield* this.getMeasuresAndRepeatInfo(measure);
+            }
+            else {
+                let ending = null;
+                let leftRepeat = false;
+                let rightRepeat = false;
+                let isLast = false;
+                if (i === 0 && container.type === 'ending') {
+                    ending = container.repeatInfo.ending;
+                }
+                if (i === 0 && container.type === 'repeat' && container.repeatInfo.repeatCount > 1) {
+                    leftRepeat = true;
+                }
+                if (container.type === 'ending' && i === container.measures.length - 1) {
+                    rightRepeat = true;
+                }
+                if (measure === container.measures[container.measures.length - 1]) {
+                    isLast = true;
+                }
+                yield { measure, ending, leftRepeat, rightRepeat, isLast };
+            }
+        }
     }
 }
 NotochordEditor.defaultProps = {

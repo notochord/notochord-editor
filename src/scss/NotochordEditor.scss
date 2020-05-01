@@ -21,7 +21,7 @@ $editing-highlight: hsl($hue, 53%, 90%);
   fill: transparent;
 }
 
-svg.NotochordEditable {
+.NotochordBeatView {
   &:hover .NotochordBeatViewBackground {
     fill: $hover-highlight;
   }

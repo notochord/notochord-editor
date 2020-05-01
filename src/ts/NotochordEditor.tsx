@@ -1,5 +1,6 @@
 import React from 'https://dev.jspm.io/react@16.9';
 import Song from 'notochord-song/types/notochord-song';
+import { MeasureContainer, Measure } from 'notochord-song/types/measure';
 
 import { slabo27pxHHeightRatio, slabo27pxHWidthRatio } from './svgConstants';
 import { MeasuresRow } from './MeasuresRow';
@@ -32,6 +33,7 @@ export class NotochordEditor extends React.Component<NotochordEditorProps, Notoc
     const charData: CharData = {
       HWidth: this.props.fontSize * slabo27pxHWidthRatio,
       HHeight: this.props.fontSize * slabo27pxHHeightRatio,
+      fontSize: this.props.fontSize,
     }
 
     const rowHeight = this.props.fontSize * 1.2;
@@ -44,15 +46,18 @@ export class NotochordEditor extends React.Component<NotochordEditorProps, Notoc
     const rows: JSX.Element[] = [];
     let freeMeasures: JSX.Element[] = [];
     const calcY = (): number => topPadding + ((rowHeight + rowYMargin) * rows.length);
-    for(const measure of this.props.song.measures) {
+    for(const { measure, ending, leftRepeat, rightRepeat, isLast } of this.getMeasuresAndRepeatInfo()) {
       const measureView = (
         <MeasureView
           key={freeMeasures.length}
-          x={measureWidth * freeMeasures.length}
+          x={1 + (measureWidth * freeMeasures.length)}
           width={measureWidth}
           height={rowHeight}
           measure={measure}
-          isLastInRow={freeMeasures.length === this.props.cols - 1}
+          ending={ending}
+          leftRepeat={leftRepeat}
+          rightRepeat={rightRepeat}
+          isLastInRow={freeMeasures.length === this.props.cols - 1 || isLast}
           charData={charData}
           scaleDegrees={this.props.scaleDegrees}
         />
@@ -89,5 +94,32 @@ export class NotochordEditor extends React.Component<NotochordEditorProps, Notoc
     this.props.song.onChange(() => {
       this.setState({});
     });
+  }
+
+  private *getMeasuresAndRepeatInfo(container: MeasureContainer = this.props.song.measureContainer): Generator<{ ending: number | null; measure: Measure; leftRepeat: boolean; rightRepeat: boolean; isLast: boolean }> {
+    for (let i = 0; i < container.measures.length; i++) {
+      const measure = container.measures[i];
+      if ('type' in measure) {
+        yield* this.getMeasuresAndRepeatInfo(measure);
+      } else {
+        let ending: null | number = null;
+        let leftRepeat = false;
+        let rightRepeat = false;
+        let isLast = false;
+        if (i === 0 && container.type === 'ending') {
+          ending = container.repeatInfo.ending!;
+        }
+        if (i === 0 && container.type === 'repeat' && container.repeatInfo.repeatCount! > 1) {
+          leftRepeat = true;
+        }
+        if (container.type === 'ending' && i === container.measures.length - 1 ) {
+          rightRepeat = true;
+        }
+        if (measure === container.measures[container.measures.length - 1]) {
+          isLast = true;
+        }
+        yield { measure, ending, leftRepeat, rightRepeat, isLast };
+      }
+    }
   }
 }

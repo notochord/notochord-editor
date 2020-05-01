@@ -8,4 +8,5 @@ declare module 'https://dev.jspm.io/tonal@2.2';
 interface CharData {
   HWidth: number;
   HHeight: number;
+  fontSize: number;
 }
