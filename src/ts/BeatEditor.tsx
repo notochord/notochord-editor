@@ -1,4 +1,5 @@
 import React from 'https://dev.jspm.io/react@16.9';
+import Tonal from 'https://dev.jspm.io/tonal@2.2';
 import Beat from 'notochord-song/types/beat';
 
 interface BeatEditorProps {
@@ -22,6 +23,7 @@ export class BeatEditor extends React.Component<BeatEditorProps, BeatEditorState
     super(props);
 
     this.onChange = this.onChange.bind(this);
+    this.onKeyDown = this.onKeyDown.bind(this);
   }
 
   public render(): JSX.Element {
@@ -41,7 +43,8 @@ export class BeatEditor extends React.Component<BeatEditorProps, BeatEditorState
           <input
             ref={this.inputRef}
             value={this.state.inputValue}
-            onChange={this.onChange.bind(this)}
+            onChange={this.onChange}
+            onKeyDown={this.onKeyDown}
             onBlur={this.props.closeEditor}
           />
         </div>
@@ -55,11 +58,11 @@ export class BeatEditor extends React.Component<BeatEditorProps, BeatEditorState
     }
   }
 
-  public onOpen(): void {
+  private onOpen(): void {
     this.inputRef.current?.focus();
   }
 
-  public onChange(): void {
+  private onChange(): void {
     const oldValue = this.props.beat.chord;
     const inputValue = this.inputRef.current?.value ?? '';
     this.props.beat.chord = inputValue || null;
@@ -69,5 +72,75 @@ export class BeatEditor extends React.Component<BeatEditorProps, BeatEditorState
     } else {
       this.setState({ inputValue: newValue ?? '' });
     }
+  }
+
+  private onKeyDown(event: React.KeyboardEvent): boolean {
+    switch(event.key) {
+      case 'Enter':
+      case 'Escape': {
+        this.props.closeEditor();
+        return false;
+      }
+      case 'Tab': {
+        if (event.shiftKey) {
+          this.focusPrevBeat()
+          return false;
+        }
+        break;
+      }
+      case 'ArrowRight': {
+        if (this.inputRef.current?.selectionStart === this.state.inputValue.length) {
+          this.focusNextBeat()
+          return false;
+        }
+        break;
+      }
+      case 'ArrowLeft': {
+        if (this.inputRef.current?.selectionStart === 0) {
+          this.focusPrevBeat()
+          return false;
+        }
+        break;
+      }
+      case 'ArrowUp': {
+        this.transpose('up');
+        return false;
+      }
+      case 'ArrowDown': {
+        this.transpose('down');
+        return false;
+      }
+      default: break;
+    }
+    return true;
+  }
+
+  private transpose(dir: 'up' | 'down'): void {
+    const chordParts = Tonal.Chord.tokenize(this.props.beat.chord) as string[];
+    chordParts[0] = Tonal.Note.enharmonic(
+      Tonal.transpose(chordParts[0], dir === 'up' ? 'm2' : 'm-2')
+    );
+    this.props.beat.chord = chordParts.join('');
+    this.setState({ inputValue: this.props.beat.chord });
+  }
+
+  private focusPrevBeat(): void {
+    // this is gonna be pretty janky
+    const parentBeat = this.inputRef.current?.closest('.NotochordBeatView') as SVGGElement;
+    if (!parentBeat) return;
+    const allBeats = [...document.querySelectorAll('.NotochordBeatView')] as SVGGElement[];
+    const index = allBeats.indexOf(parentBeat);
+    if (index === -1 || index === 0) return;
+    allBeats[index - 1].focus();
+  }
+
+  private focusNextBeat(): void {
+    // this is gonna be pretty janky
+    const parentBeat = this.inputRef.current?.closest('.NotochordBeatView') as SVGGElement;
+    if (!parentBeat) return;
+    const allBeats = [...document.querySelectorAll('.NotochordBeatView')] as SVGGElement[];
+    const index = allBeats.indexOf(parentBeat);
+    if (index === -1 || index === allBeats.length - 1) return;
+    allBeats[index + 1].focus();
   }
 }

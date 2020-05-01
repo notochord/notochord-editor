@@ -31,13 +31,14 @@ class BeatEditor extends React.Component {
             inputValue: (_b = (_a = this.props.beat) === null || _a === void 0 ? void 0 : _a.chord) !== null && _b !== void 0 ? _b : '',
         };
         this.onChange = this.onChange.bind(this);
+        this.onKeyDown = this.onKeyDown.bind(this);
     }
     render() {
         return (React.createElement("foreignObject", { width: 66, height: 27, y: -25, x: (66 - this.props.parentWidth) / 2 * -1, className: `NotochordChordEditor${this.props.open ? ' show' : ''}` },
             React.createElement("div", { 
                 // @ts-ignore
                 xmlns: "http://www.w3.org/1999/xhtml", className: "NotochordChordEditorContainer" },
-                React.createElement("input", { ref: this.inputRef, value: this.state.inputValue, onChange: this.onChange.bind(this), onBlur: this.props.closeEditor }))));
+                React.createElement("input", { ref: this.inputRef, value: this.state.inputValue, onChange: this.onChange, onKeyDown: this.onKeyDown, onBlur: this.props.closeEditor }))));
     }
     componentDidUpdate(prevProps) {
         if (this.props.open && !prevProps.open) {
@@ -60,6 +61,76 @@ class BeatEditor extends React.Component {
         else {
             this.setState({ inputValue: newValue !== null && newValue !== void 0 ? newValue : '' });
         }
+    }
+    onKeyDown(event) {
+        var _a, _b;
+        switch (event.key) {
+            case 'Enter':
+            case 'Escape': {
+                this.props.closeEditor();
+                return false;
+            }
+            case 'Tab': {
+                if (event.shiftKey) {
+                    this.focusPrevBeat();
+                    return false;
+                }
+                break;
+            }
+            case 'ArrowRight': {
+                if (((_a = this.inputRef.current) === null || _a === void 0 ? void 0 : _a.selectionStart) === this.state.inputValue.length) {
+                    this.focusNextBeat();
+                    return false;
+                }
+                break;
+            }
+            case 'ArrowLeft': {
+                if (((_b = this.inputRef.current) === null || _b === void 0 ? void 0 : _b.selectionStart) === 0) {
+                    this.focusPrevBeat();
+                    return false;
+                }
+                break;
+            }
+            case 'ArrowUp': {
+                this.transpose('up');
+                return false;
+            }
+            case 'ArrowDown': {
+                this.transpose('down');
+                return false;
+            }
+        }
+        return true;
+    }
+    transpose(dir) {
+        const chordParts = Tonal.Chord.tokenize(this.props.beat.chord);
+        chordParts[0] = Tonal.Note.enharmonic(Tonal.transpose(chordParts[0], dir === 'up' ? 'm2' : 'm-2'));
+        this.props.beat.chord = chordParts.join('');
+        this.setState({ inputValue: this.props.beat.chord });
+    }
+    focusPrevBeat() {
+        var _a;
+        // this is gonna be pretty janky
+        const parentBeat = (_a = this.inputRef.current) === null || _a === void 0 ? void 0 : _a.closest('.NotochordBeatView');
+        if (!parentBeat)
+            return;
+        const allBeats = [...document.querySelectorAll('.NotochordBeatView')];
+        const index = allBeats.indexOf(parentBeat);
+        if (index === -1 || index === 0)
+            return;
+        allBeats[index - 1].focus();
+    }
+    focusNextBeat() {
+        var _a;
+        // this is gonna be pretty janky
+        const parentBeat = (_a = this.inputRef.current) === null || _a === void 0 ? void 0 : _a.closest('.NotochordBeatView');
+        if (!parentBeat)
+            return;
+        const allBeats = [...document.querySelectorAll('.NotochordBeatView')];
+        const index = allBeats.indexOf(parentBeat);
+        if (index === -1 || index === allBeats.length - 1)
+            return;
+        allBeats[index + 1].focus();
     }
 }
 
@@ -180,7 +251,7 @@ class NotochordEditor extends React.Component {
         const rowYMargin = 0.3 * rowHeight;
         const innerWidth = this.props.width - 2;
         const measureWidth = innerWidth / this.props.cols;
-        const topPadding = 0.5 * (rowHeight - charData.HHeight);
+        const topPadding = 30;
         const rows = [];
         let freeMeasures = [];
         const calcY = () => topPadding + ((rowHeight + rowYMargin) * rows.length);

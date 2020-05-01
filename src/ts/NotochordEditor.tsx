@@ -41,7 +41,7 @@ export class NotochordEditor extends React.Component<NotochordEditorProps, Notoc
     const rowYMargin = 0.3 * rowHeight;
     const innerWidth = this.props.width - 2;
     const measureWidth = innerWidth / this.props.cols;
-    const topPadding = 0.5 * (rowHeight - charData.HHeight);
+    const topPadding = 30;
 
     const rows: JSX.Element[] = [];
     let freeMeasures: JSX.Element[] = [];
