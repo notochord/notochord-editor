@@ -1,6 +1,5 @@
-/// <reference types="react" />
-import React from 'https://dev.jspm.io/react@16.9';
-import Beat from 'notochord-song/types/beat';
+import * as React from 'react';
+import { Beat } from 'notochord-song';
 interface BeatViewProps {
     x: number;
     width: number;
@@ -8,11 +7,20 @@ interface BeatViewProps {
     beat: Beat;
     charData: CharData;
     scaleDegrees: boolean;
+    editable: boolean;
 }
-export declare class BeatView extends React.Component<BeatViewProps> {
+interface BeatViewState {
+    editorOpen: boolean;
+}
+export declare class BeatView extends React.Component<BeatViewProps, BeatViewState> {
+    state: {
+        editorOpen: boolean;
+    };
+    constructor(props: BeatViewProps);
     render(): JSX.Element;
     private getRootText;
     private getBottomText;
     private openEditor;
+    private closeEditor;
 }
 export {};

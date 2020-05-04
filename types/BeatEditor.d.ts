@@ -1,9 +1,27 @@
-/// <reference types="react" />
-import React from 'https://dev.jspm.io/react@16.9';
-interface MeasuresRowProps {
-    y: number;
+import * as React from 'react';
+import { Beat } from 'notochord-song';
+interface BeatEditorProps {
+    beat: Beat;
+    open: boolean;
+    parentWidth: number;
+    closeEditor: () => void;
 }
-export declare class MeasuresRow extends React.Component<MeasuresRowProps> {
+interface BeatEditorState {
+    inputValue: string;
+}
+export declare class BeatEditor extends React.Component<BeatEditorProps, BeatEditorState> {
+    inputRef: React.RefObject<HTMLInputElement>;
+    state: {
+        inputValue: any;
+    };
+    constructor(props: BeatEditorProps);
     render(): JSX.Element;
+    componentDidUpdate(prevProps: BeatEditorProps): void;
+    private onOpen;
+    private onChange;
+    private onKeyDown;
+    private transpose;
+    private focusPrevBeat;
+    private focusNextBeat;
 }
 export {};

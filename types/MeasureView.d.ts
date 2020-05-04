@@ -1,6 +1,5 @@
-/// <reference types="react" />
-import React from 'https://dev.jspm.io/react@16.9';
-import { Measure } from 'notochord-song/types/measure';
+import * as React from 'react';
+import { Measure } from 'notochord-song';
 interface MeasureViewProps {
     x: number;
     width: number;
@@ -12,6 +11,7 @@ interface MeasureViewProps {
     isLastInRow: boolean;
     charData: CharData;
     scaleDegrees: boolean;
+    editable: boolean;
 }
 export declare class MeasureView extends React.Component<MeasureViewProps> {
     render(): JSX.Element;

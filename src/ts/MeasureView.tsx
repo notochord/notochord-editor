@@ -1,5 +1,5 @@
-import React from 'https://dev.jspm.io/react@16.9';
-import { Measure } from 'notochord-song/types/measure';
+import * as React from 'react';
+import { Measure } from 'notochord-song';
 
 import { BeatView } from './BeatView';
 

@@ -1,6 +1,5 @@
-import React from 'https://dev.jspm.io/react@16.9';
-import Tonal from 'https://dev.jspm.io/tonal@2.2';
-import Beat from 'notochord-song/types/beat';
+import * as React from 'react';
+import { Beat } from 'notochord-song';
 
 interface BeatEditorProps {
   beat: Beat;
@@ -103,11 +102,11 @@ export class BeatEditor extends React.Component<BeatEditorProps, BeatEditorState
         break;
       }
       case 'ArrowUp': {
-        this.transpose('up');
+        this.transpose(1);
         return false;
       }
       case 'ArrowDown': {
-        this.transpose('down');
+        this.transpose(-1);
         return false;
       }
       default: break;
@@ -115,13 +114,9 @@ export class BeatEditor extends React.Component<BeatEditorProps, BeatEditorState
     return true;
   }
 
-  private transpose(dir: 'up' | 'down'): void {
-    const chordParts = Tonal.Chord.tokenize(this.props.beat.chord) as string[];
-    chordParts[0] = Tonal.Note.enharmonic(
-      Tonal.transpose(chordParts[0], dir === 'up' ? 'm2' : 'm-2')
-    );
-    this.props.beat.chord = chordParts.join('');
-    this.setState({ inputValue: this.props.beat.chord });
+  private transpose(semitones: number): void {
+    this.props.beat.changeBySemitones(semitones);
+    this.setState({ inputValue: this.props.beat.chord ?? '' });
   }
 
   private focusPrevBeat(): void {

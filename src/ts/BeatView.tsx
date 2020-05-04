@@ -1,6 +1,5 @@
-import React from 'https://dev.jspm.io/react@16.9';
-import Tonal from 'https://dev.jspm.io/tonal@2.2';
-import Beat from 'notochord-song/types/beat';
+import * as React from 'react';
+import { Beat } from 'notochord-song';
 
 import { deltaChar, sharp, sharpHeight, flat, flatHeight } from './svgConstants';
 import { BeatEditor } from './BeatEditor';
@@ -28,8 +27,8 @@ export class BeatView extends React.Component<BeatViewProps, BeatViewState> {
     this.closeEditor = this.closeEditor.bind(this);
   }
   public render(): JSX.Element {
-    const { rootText, accidentalText } = this.getRootText();
-    const bottomText = this.getBottomText();
+    const { rootText, accidental: accidentalText, quality: rawQualityText } = this.getChordParts();
+    const qualityText = this.formatQuality(rawQualityText);
     let accidental: JSX.Element | null = null;
     if (accidentalText) {
       const goalHeight = (this.props.charData.HHeight * 0.6);
@@ -50,7 +49,7 @@ export class BeatView extends React.Component<BeatViewProps, BeatViewState> {
       <text
         transform={`translate(${this.props.charData.HWidth + 3} ${chordRootY + (0.5 * this.props.charData.HHeight)}) scale(0.5)`}
       >
-        {bottomText}
+        {qualityText}
       </text>
     );
     const editor = (
@@ -81,36 +80,24 @@ export class BeatView extends React.Component<BeatViewProps, BeatViewState> {
     );
   }
 
-  private getRootText(): { rootText: string; accidentalText: 'b' | '#' | '' } {
+  private getChordParts(): { rootText: string; accidental: 'b' | '#' | ''; quality: string } {
     if (!this.props.beat.chord) {
       return {
         rootText: '',
-        accidentalText: '',
+        accidental: '',
+        quality: '',
       }
     } else if (this.props.scaleDegrees) {
-      const degree = this.props.beat.scaleDegree;
-      return {
-        rootText: degree.numeral,
-        accidentalText: degree.flat ? 'b' : '',
-      }
+      return this.props.beat.getScaleDegreeParts();
     } else {
-      const [rootPart] = Tonal.Chord.tokenize(this.props.beat.chord) as string[];
-      let accidentalText: 'b' | '#' | '' = '';
-      if (rootPart[1] === 'b') accidentalText = 'b';
-      if (rootPart[1] === '#') accidentalText = '#';
-      return {
-        accidentalText,
-        rootText: rootPart[0],
-      };
+      return this.props.beat.getChordParts();
     }
   }
 
-  private getBottomText(): string {
-    let bottomText: string | undefined = Tonal.Chord.tokenize(this.props.beat.chord)[1];
-    if(!bottomText) return '';
-    bottomText = bottomText.replace(/M(?=7|9|11|13)/, deltaChar);
-    bottomText = bottomText.replace(/m/g, '-');
-    return bottomText;
+  private formatQuality(quality: string): string {
+    return quality
+      .replace(/M(?=7|9|11|13)/, deltaChar)
+      .replace(/m/g, '-');
   }
 
   private openEditor(): void {

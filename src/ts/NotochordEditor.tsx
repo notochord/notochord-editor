@@ -1,6 +1,5 @@
-import React from 'https://dev.jspm.io/react@16.9';
-import Song from 'notochord-song/types/notochord-song';
-import { MeasureContainer, Measure } from 'notochord-song/types/measure';
+import * as React from 'react';
+import { Song, MeasureContainer, Measure } from 'notochord-song';
 
 import { slabo27pxHHeightRatio, slabo27pxHWidthRatio } from './svgConstants';
 import { MeasuresRow } from './MeasuresRow';

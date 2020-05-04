@@ -1,11 +1,13 @@
 {
   "name": "notochord-editor",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "",
   "main": "dist/NotochordEditor.mjs",
+  "type": "module",
   "types": "types/NotochordEditor.d.ts",
   "scripts": {
     "playground": "npx http-server -o playground.html",
+    "link": "npm link ~/git/notochord-song",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npm run build-scss; npm run build-ts; # npm run build-declarations",
     "build-scss": "npx sass src/scss/NotochordEditor.scss dist/NotochordEditor.css",
@@ -30,7 +32,6 @@
     "eslint-plugin-react": "^7.19.0",
     "http-server": "^0.12.1",
     "rollup": "^1.17.0",
-    "rollup-plugin-alias": "^1.5.2",
     "rollup-plugin-banner": "^0.2.0",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-typescript": "^1.0.1",
@@ -39,6 +40,8 @@
     "typescript": "^3.5.3"
   },
   "peerDependencies": {
-    "notochord-song": "git+https://github.com/notochord/notochord-song.git#2.1.0"
-  }
+    "notochord-song": "git+https://github.com/notochord/notochord-song.git#3.0.0",
+    "react": ">=16.0"
+  },
+  "dependencies": {}
 }

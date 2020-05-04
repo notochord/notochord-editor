@@ -1,4 +1,4 @@
-import React from 'https://dev.jspm.io/react@16.9';
+import * as React from 'react';
 
 interface MeasuresRowProps {
   y: number;

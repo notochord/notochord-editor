@@ -1,6 +1,5 @@
-/// <reference types="react" />
-import React from 'https://dev.jspm.io/react@16.9';
-import Song from 'notochord-song/types/notochord-song';
+import * as React from 'react';
+import { Song } from 'notochord-song';
 interface NotochordEditorProps {
     song: Song;
     cols: number;

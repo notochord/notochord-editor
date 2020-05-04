@@ -3,8 +3,7 @@
  * This software is provided as-is, yadda yadda yadda
  */
 
-import React from 'https://dev.jspm.io/react@16.9';
-import Tonal from 'https://dev.jspm.io/tonal@2.2';
+import { Component, createElement, createRef, Fragment } from 'react';
 
 // https://commons.wikimedia.org/wiki/File:B%C3%A9mol.svg
 const flat = 'm 1.380956,10.84306 -0.02557,1.68783 0,0.28131 c 0,0.56261 0.02557,1.12522 0.102293,1.68783 1.150797,-0.97178 2.378313,-2.04586 2.378313,-3.55468 0,-0.84392 -0.358026,-1.7134103 -1.09965,-1.7134103 -0.792771,0 -1.329809,0.7672 -1.355382,1.6111203 z M 0.306879,15.42067 0,0.20457992 C 0.204586,0.07671992 0.460319,-7.6580061e-8 0.690478,-7.6580061e-8 0.920637,-7.6580061e-8 1.17637,0.07669992 1.380956,0.20457992 L 1.201943,9.0273597 c 0.639331,-0.53704 1.483249,-0.8695 2.327166,-0.8695 1.329809,0 2.27602,1.22752 2.27602,2.6084803 0,2.04586 -2.1993,2.99207 -3.759269,4.32188 C 1.662261,15.42067 1.432102,16.06 0.895064,16.06 0.562612,16.06 0.306879,15.77869 0.306879,15.42067 Z';
@@ -16,17 +15,17 @@ const deltaChar = '\u0394';
 const slabo27pxHWidthRatio = 30 / 50;
 const slabo27pxHHeightRatio = 33.33 / 50;
 
-class MeasuresRow extends React.Component {
+class MeasuresRow extends Component {
     render() {
-        return (React.createElement("g", { className: "NotochordMeasuresRow", transform: `translate(0 ${this.props.y})` }, this.props.children));
+        return (createElement("g", { className: "NotochordMeasuresRow", transform: `translate(0 ${this.props.y})` }, this.props.children));
     }
 }
 
-class BeatEditor extends React.Component {
+class BeatEditor extends Component {
     constructor(props) {
         var _a, _b;
         super(props);
-        this.inputRef = React.createRef();
+        this.inputRef = createRef();
         this.state = {
             inputValue: (_b = (_a = this.props.beat) === null || _a === void 0 ? void 0 : _a.chord) !== null && _b !== void 0 ? _b : '',
         };
@@ -34,11 +33,11 @@ class BeatEditor extends React.Component {
         this.onKeyDown = this.onKeyDown.bind(this);
     }
     render() {
-        return (React.createElement("foreignObject", { width: 66, height: 27, y: -25, x: (66 - this.props.parentWidth) / 2 * -1, className: `NotochordChordEditor${this.props.open ? ' show' : ''}` },
-            React.createElement("div", { 
+        return (createElement("foreignObject", { width: 66, height: 27, y: -25, x: (66 - this.props.parentWidth) / 2 * -1, className: `NotochordChordEditor${this.props.open ? ' show' : ''}` },
+            createElement("div", { 
                 // @ts-ignore
                 xmlns: "http://www.w3.org/1999/xhtml", className: "NotochordChordEditorContainer" },
-                React.createElement("input", { ref: this.inputRef, value: this.state.inputValue, onChange: this.onChange, onKeyDown: this.onKeyDown, onBlur: this.props.closeEditor }))));
+                createElement("input", { ref: this.inputRef, value: this.state.inputValue, onChange: this.onChange, onKeyDown: this.onKeyDown, onBlur: this.props.closeEditor }))));
     }
     componentDidUpdate(prevProps) {
         if (this.props.open && !prevProps.open) {
@@ -92,21 +91,20 @@ class BeatEditor extends React.Component {
                 break;
             }
             case 'ArrowUp': {
-                this.transpose('up');
+                this.transpose(1);
                 return false;
             }
             case 'ArrowDown': {
-                this.transpose('down');
+                this.transpose(-1);
                 return false;
             }
         }
         return true;
     }
-    transpose(dir) {
-        const chordParts = Tonal.Chord.tokenize(this.props.beat.chord);
-        chordParts[0] = Tonal.Note.enharmonic(Tonal.transpose(chordParts[0], dir === 'up' ? 'm2' : 'm-2'));
-        this.props.beat.chord = chordParts.join('');
-        this.setState({ inputValue: this.props.beat.chord });
+    transpose(semitones) {
+        var _a;
+        this.props.beat.changeBySemitones(semitones);
+        this.setState({ inputValue: (_a = this.props.beat.chord) !== null && _a !== void 0 ? _a : '' });
     }
     focusPrevBeat() {
         var _a;
@@ -134,7 +132,7 @@ class BeatEditor extends React.Component {
     }
 }
 
-class BeatView extends React.Component {
+class BeatView extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -144,8 +142,8 @@ class BeatView extends React.Component {
         this.closeEditor = this.closeEditor.bind(this);
     }
     render() {
-        const { rootText, accidentalText } = this.getRootText();
-        const bottomText = this.getBottomText();
+        const { rootText, accidental: accidentalText, quality: rawQualityText } = this.getChordParts();
+        const qualityText = this.formatQuality(rawQualityText);
         let accidental = null;
         if (accidentalText) {
             const goalHeight = (this.props.charData.HHeight * 0.6);
@@ -155,52 +153,37 @@ class BeatView extends React.Component {
             if (accidentalText === '#')
                 y += goalHeight; // # is above its origin, b is below
             const scale = goalHeight / origHeight;
-            accidental = (React.createElement("path", { d: accidentalText === '#' ? sharp : flat, transform: `translate(${x}, ${y}) scale(${scale})` }));
+            accidental = (createElement("path", { d: accidentalText === '#' ? sharp : flat, transform: `translate(${x}, ${y}) scale(${scale})` }));
         }
         const chordRootY = 0.3 * this.props.charData.HHeight;
-        const bottom = (React.createElement("text", { transform: `translate(${this.props.charData.HWidth + 3} ${chordRootY + (0.5 * this.props.charData.HHeight)}) scale(0.5)` }, bottomText));
-        const editor = (React.createElement(BeatEditor, { beat: this.props.beat, open: this.state.editorOpen, parentWidth: this.props.width, closeEditor: this.closeEditor }));
-        return (React.createElement("g", { className: "NotochordBeatView", transform: `translate(${this.props.x} 0)`, tabIndex: 0, onFocus: this.openEditor },
-            React.createElement("rect", { className: "NotochordBeatViewBackground", width: this.props.width, height: this.props.height }),
-            React.createElement("text", { transform: `translate(0 ${chordRootY})` }, rootText),
+        const bottom = (createElement("text", { transform: `translate(${this.props.charData.HWidth + 3} ${chordRootY + (0.5 * this.props.charData.HHeight)}) scale(0.5)` }, qualityText));
+        const editor = (createElement(BeatEditor, { beat: this.props.beat, open: this.state.editorOpen, parentWidth: this.props.width, closeEditor: this.closeEditor }));
+        return (createElement("g", { className: "NotochordBeatView", transform: `translate(${this.props.x} 0)`, tabIndex: 0, onFocus: this.openEditor },
+            createElement("rect", { className: "NotochordBeatViewBackground", width: this.props.width, height: this.props.height }),
+            createElement("text", { transform: `translate(0 ${chordRootY})` }, rootText),
             accidental,
             bottom,
             editor));
     }
-    getRootText() {
+    getChordParts() {
         if (!this.props.beat.chord) {
             return {
                 rootText: '',
-                accidentalText: '',
+                accidental: '',
+                quality: '',
             };
         }
         else if (this.props.scaleDegrees) {
-            const degree = this.props.beat.scaleDegree;
-            return {
-                rootText: degree.numeral,
-                accidentalText: degree.flat ? 'b' : '',
-            };
+            return this.props.beat.getScaleDegreeParts();
         }
         else {
-            const [rootPart] = Tonal.Chord.tokenize(this.props.beat.chord);
-            let accidentalText = '';
-            if (rootPart[1] === 'b')
-                accidentalText = 'b';
-            if (rootPart[1] === '#')
-                accidentalText = '#';
-            return {
-                accidentalText,
-                rootText: rootPart[0],
-            };
+            return this.props.beat.getChordParts();
         }
     }
-    getBottomText() {
-        let bottomText = Tonal.Chord.tokenize(this.props.beat.chord)[1];
-        if (!bottomText)
-            return '';
-        bottomText = bottomText.replace(/M(?=7|9|11|13)/, deltaChar);
-        bottomText = bottomText.replace(/m/g, '-');
-        return bottomText;
+    formatQuality(quality) {
+        return quality
+            .replace(/M(?=7|9|11|13)/, deltaChar)
+            .replace(/m/g, '-');
     }
     openEditor() {
         if (this.props.editable)
@@ -211,26 +194,26 @@ class BeatView extends React.Component {
     }
 }
 
-class MeasureView extends React.Component {
+class MeasureView extends Component {
     render() {
-        const leftBar = (React.createElement("path", { d: `M 0,0 0,${this.props.height}`, style: { strokeWidth: 1, stroke: 'black' } }));
-        const rightBar = this.props.isLastInRow ? (React.createElement("path", { d: `M ${this.props.width},0 ${this.props.width},${this.props.height}`, style: { strokeWidth: 1, stroke: 'black' } })) : null;
-        const ending = this.props.ending && (React.createElement(React.Fragment, null,
-            React.createElement("text", { x: this.props.width * 0.02, y: this.props.height * -.17, fontSize: this.props.charData.fontSize * 0.25 }, this.props.ending),
-            React.createElement("path", { d: `M 0,${this.props.height * -.05} 0,${this.props.height * -.2} ${this.props.width},${this.props.height * -.2}`, style: { strokeWidth: 1, stroke: 'black', fill: 'none' } })));
-        const leftRepeat = this.props.leftRepeat ? (React.createElement(React.Fragment, null,
-            React.createElement("circle", { cx: this.props.width * 0.03, cy: this.props.height * 0.4, r: this.props.height * 0.03 }),
-            React.createElement("circle", { cx: this.props.width * 0.03, cy: this.props.height * 0.6, r: this.props.height * 0.03 }))) : null;
-        const rightRepeat = this.props.rightRepeat ? (React.createElement(React.Fragment, null,
-            React.createElement("circle", { cx: this.props.width * 0.97, cy: this.props.height * 0.4, r: this.props.height * 0.03 }),
-            React.createElement("circle", { cx: this.props.width * 0.97, cy: this.props.height * 0.6, r: this.props.height * 0.03 }))) : null;
+        const leftBar = (createElement("path", { d: `M 0,0 0,${this.props.height}`, style: { strokeWidth: 1, stroke: 'black' } }));
+        const rightBar = this.props.isLastInRow ? (createElement("path", { d: `M ${this.props.width},0 ${this.props.width},${this.props.height}`, style: { strokeWidth: 1, stroke: 'black' } })) : null;
+        const ending = this.props.ending && (createElement(Fragment, null,
+            createElement("text", { x: this.props.width * 0.02, y: this.props.height * -.17, fontSize: this.props.charData.fontSize * 0.25 }, this.props.ending),
+            createElement("path", { d: `M 0,${this.props.height * -.05} 0,${this.props.height * -.2} ${this.props.width},${this.props.height * -.2}`, style: { strokeWidth: 1, stroke: 'black', fill: 'none' } })));
+        const leftRepeat = this.props.leftRepeat ? (createElement(Fragment, null,
+            createElement("circle", { cx: this.props.width * 0.03, cy: this.props.height * 0.4, r: this.props.height * 0.03 }),
+            createElement("circle", { cx: this.props.width * 0.03, cy: this.props.height * 0.6, r: this.props.height * 0.03 }))) : null;
+        const rightRepeat = this.props.rightRepeat ? (createElement(Fragment, null,
+            createElement("circle", { cx: this.props.width * 0.97, cy: this.props.height * 0.4, r: this.props.height * 0.03 }),
+            createElement("circle", { cx: this.props.width * 0.97, cy: this.props.height * 0.6, r: this.props.height * 0.03 }))) : null;
         const beatMargin = this.props.width * 0.06;
         const beatWidthAndMargin = (this.props.width - beatMargin) / this.props.measure.length;
         const beatWidth = beatWidthAndMargin - beatMargin;
         const beatViews = this.props.measure.beats.map((beat, index) => {
-            return (React.createElement(BeatView, { key: index, x: beatMargin + (index * beatWidthAndMargin), width: beatWidth, height: this.props.height, beat: beat, charData: this.props.charData, scaleDegrees: this.props.scaleDegrees, editable: this.props.editable }));
+            return (createElement(BeatView, { key: index, x: beatMargin + (index * beatWidthAndMargin), width: beatWidth, height: this.props.height, beat: beat, charData: this.props.charData, scaleDegrees: this.props.scaleDegrees, editable: this.props.editable }));
         });
-        return (React.createElement("g", { className: "NotochordMeasureView", transform: `translate(${this.props.x} 0)` },
+        return (createElement("g", { className: "NotochordMeasureView", transform: `translate(${this.props.x} 0)` },
             ending,
             leftBar,
             leftRepeat,
@@ -240,7 +223,7 @@ class MeasureView extends React.Component {
     }
 }
 
-class NotochordEditor extends React.Component {
+class NotochordEditor extends Component {
     render() {
         const charData = {
             HWidth: this.props.fontSize * slabo27pxHWidthRatio,
@@ -257,17 +240,17 @@ class NotochordEditor extends React.Component {
         let freeMeasures = [];
         const calcY = () => topPadding + ((rowHeight + rowYMargin) * rows.length);
         for (const { measure, ending, leftRepeat, rightRepeat, isLast } of this.getMeasuresAndRepeatInfo()) {
-            const measureView = (React.createElement(MeasureView, { key: freeMeasures.length, x: 1 + (measureWidth * freeMeasures.length), width: measureWidth, height: rowHeight, measure: measure, ending: ending, leftRepeat: leftRepeat, rightRepeat: rightRepeat, isLastInRow: freeMeasures.length === this.props.cols - 1 || isLast, charData: charData, scaleDegrees: this.props.scaleDegrees, editable: this.props.editable }));
+            const measureView = (createElement(MeasureView, { key: freeMeasures.length, x: 1 + (measureWidth * freeMeasures.length), width: measureWidth, height: rowHeight, measure: measure, ending: ending, leftRepeat: leftRepeat, rightRepeat: rightRepeat, isLastInRow: freeMeasures.length === this.props.cols - 1 || isLast, charData: charData, scaleDegrees: this.props.scaleDegrees, editable: this.props.editable }));
             freeMeasures.push(measureView);
             if (freeMeasures.length === this.props.cols) {
-                rows.push(React.createElement(MeasuresRow, { key: rows.length, y: calcY() }, freeMeasures));
+                rows.push(createElement(MeasuresRow, { key: rows.length, y: calcY() }, freeMeasures));
                 freeMeasures = [];
             }
         }
         if (freeMeasures.length) {
-            rows.push(React.createElement(MeasuresRow, { key: rows.length, y: calcY() }, freeMeasures));
+            rows.push(createElement(MeasuresRow, { key: rows.length, y: calcY() }, freeMeasures));
         }
-        return (React.createElement("svg", { className: `NotochordSVGElement${this.props.editable ? ' NotochordEditable' : ''}`, viewBox: `0 0 ${this.props.width} ${this.props.height}`, style: { fontSize: this.props.fontSize }, width: this.props.width }, rows));
+        return (createElement("svg", { className: `NotochordSVGElement${this.props.editable ? ' NotochordEditable' : ''}`, viewBox: `0 0 ${this.props.width} ${this.props.height}`, style: { fontSize: this.props.fontSize }, width: this.props.width }, rows));
     }
     componentDidMount() {
         this.props.song.onChange(() => {
