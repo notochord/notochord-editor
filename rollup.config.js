@@ -7,9 +7,10 @@ export default [
   {
     input: './src/ts/NotochordEditor.tsx',
     output: {
-      file: './dist/NotochordEditor.mjs',
+      file: './dist/NotochordEditor.js',
       format: 'esm'
     },
+    external: ['react'],
     plugins: [
       typescript(),
       banner(preamble)

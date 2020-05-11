@@ -1,8 +1,8 @@
 {
   "name": "notochord-editor",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "",
-  "main": "dist/NotochordEditor.mjs",
+  "main": "dist/NotochordEditor.js",
   "type": "module",
   "types": "types/NotochordEditor.d.ts",
   "scripts": {
